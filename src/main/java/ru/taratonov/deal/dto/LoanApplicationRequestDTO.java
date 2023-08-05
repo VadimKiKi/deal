@@ -54,7 +54,6 @@ public class LoanApplicationRequestDTO {
     @Size(min = 6, max = 6, message = "must be 6 digits long")
     private String passportNumber;
 
-
     @AssertTrue(message = "must be no later than 18 years from the current day")
     public boolean isBirthDateValid() {
         return !birthdate.plusYears(18).isAfter(LocalDate.now());
