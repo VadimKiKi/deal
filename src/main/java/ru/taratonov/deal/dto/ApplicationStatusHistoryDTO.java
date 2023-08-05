@@ -7,12 +7,9 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import lombok.Data;
 import lombok.experimental.Accessors;
-import org.springframework.format.annotation.DateTimeFormat;
 import ru.taratonov.deal.enums.ApplicationStatus;
 import ru.taratonov.deal.enums.ChangeType;
 
-import java.sql.Date;
-import java.sql.Timestamp;
 import java.time.LocalDate;
 
 @Data
