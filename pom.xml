@@ -39,6 +39,15 @@
             <version>${project.parent.version}</version>
         </dependency>
 
+        <!-- Json for LocalDate -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+            <version>2.15.2</version>
+        </dependency>
+
+
+
         <!-- Liquibase - это инструмент для управления изменениями в базе данных и их выполнения -->
         <dependency>
             <groupId>org.liquibase</groupId>
