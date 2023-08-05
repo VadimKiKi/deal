@@ -11,6 +11,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -64,7 +65,7 @@ public class Client {
     private MaritalStatus maritalStatus;
 
     @Column(name = "dependent_amount")
-    private int dependentAmount;
+    private Integer dependentAmount;
 
     @Column(name = "passport_id")
     @JdbcTypeCode(SqlTypes.JSON)
@@ -77,7 +78,7 @@ public class Client {
     @Column(name = "account")
     private String account;
 
-    @OneToMany(mappedBy = "client", fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+    @OneToOne(mappedBy = "client")
     @JsonManagedReference(value = "client_application")
-    private List<Application> applicationList;
+    private Application application;
 }

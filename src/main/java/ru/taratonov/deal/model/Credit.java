@@ -1,21 +1,28 @@
 package ru.taratonov.deal.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
 import lombok.Data;
+import lombok.experimental.Accessors;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import ru.taratonov.deal.dto.PaymentScheduleElement;
+import ru.taratonov.deal.enums.CreditStatus;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
 @Data
+@Accessors(chain = true)
+
 public class Credit {
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -49,8 +56,10 @@ public class Credit {
     private Boolean salaryClient;
 
     @Column(name = "credit_status")
-    private String creditStatus;
+    @Enumerated(EnumType.STRING)
+    private CreditStatus creditStatus;
 
     @OneToOne(mappedBy = "credit")
+    @JsonManagedReference(value = "credit_application")
     private Application application;
 }
