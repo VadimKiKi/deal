@@ -10,6 +10,7 @@ import ru.taratonov.deal.dto.CreditDTO;
 import ru.taratonov.deal.dto.LoanApplicationRequestDTO;
 import ru.taratonov.deal.dto.LoanOfferDTO;
 import ru.taratonov.deal.dto.ScoringDataDTO;
+import ru.taratonov.deal.util.DealResponseErrorHandler;
 
 import java.util.Arrays;
 import java.util.List;
@@ -28,17 +29,17 @@ public class RestTemplateRequestsService {
     @Autowired
     public RestTemplateRequestsService(RestTemplateBuilder restTemplateBuilder) {
         restTemplate = restTemplateBuilder
-//                    .errorHandler(new RestTemplateResponseErrorHandler())
+                .errorHandler(new DealResponseErrorHandler())
                 .build();
     }
 
-    public List<LoanOfferDTO> requestToGetOffers(LoanApplicationRequestDTO loanApplicationRequestDTO){
+    public List<LoanOfferDTO> requestToGetOffers(LoanApplicationRequestDTO loanApplicationRequestDTO) {
         ResponseEntity<LoanOfferDTO[]> responseEntity =
                 restTemplate.postForEntity(PATH_TO_CONVEYOR_GET_OFFERS, loanApplicationRequestDTO, LoanOfferDTO[].class);
         return Arrays.stream(Objects.requireNonNull(responseEntity.getBody())).toList();
     }
 
-    public CreditDTO requestToCalculateCredit(ScoringDataDTO scoringDataDTO){
+    public CreditDTO requestToCalculateCredit(ScoringDataDTO scoringDataDTO) {
         ResponseEntity<CreditDTO> creditDTOResponseEntity =
                 restTemplate.postForEntity(PATH_TO_CONVEYOR_CALCULATE_CREDIT, scoringDataDTO, CreditDTO.class);
         return Objects.requireNonNull(creditDTOResponseEntity.getBody());
