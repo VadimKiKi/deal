@@ -36,8 +36,7 @@ public class ControllerAdvice {
     @ResponseBody
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler({EntityNotFoundException.class, IllegalArgumentException.class,
-            NullPointerException.class, ApplicationNotFoundException.class,
-            IllegalDataFromOtherMsException.class})
+            NullPointerException.class, IllegalDataFromOtherMsException.class})
     public ErrorDTO handleOtherException(Exception ex) {
         log.error("Handle Exception", ex);
         return new ErrorDTO(ex.getMessage(), LocalDateTime.now(), HttpStatus.BAD_REQUEST);
@@ -49,5 +48,13 @@ public class ControllerAdvice {
     public ErrorDTO handleLongException(RuntimeException ex) {
         log.error("Handle Exception", ex);
         return new ErrorDTO(ex.getCause().getCause().getMessage(), LocalDateTime.now(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ResponseBody
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler({ApplicationNotFoundException.class})
+    public ErrorDTO handleNotFoundException(Exception ex) {
+        log.error("Handle Exception", ex);
+        return new ErrorDTO(ex.getMessage(), LocalDateTime.now(), HttpStatus.NOT_FOUND);
     }
 }

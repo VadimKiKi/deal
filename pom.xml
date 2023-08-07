@@ -78,7 +78,7 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- Swagger http://localhost:8080/swagger-ui/index.html -->
+        <!-- Swagger http://localhost:8081/swagger-ui/index.html -->
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
