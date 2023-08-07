@@ -1,5 +1,6 @@
 package ru.taratonov.deal.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.taratonov.deal.dto.ApplicationStatusHistoryDTO;
 import ru.taratonov.deal.dto.CreditDTO;
@@ -19,9 +20,11 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Service
+@Slf4j
 public class FillingDataService {
 
     public Client createClientOfRequest(LoanApplicationRequestDTO loanApplicationRequestDTO) {
+        log.debug("Start create new client with data from {}", loanApplicationRequestDTO);
         return new Client()
                 .setFirstName(loanApplicationRequestDTO.getFirstName())
                 .setLastName(loanApplicationRequestDTO.getLastName())
@@ -35,12 +38,14 @@ public class FillingDataService {
     }
 
     public Application createApplicationOfRequest(Client client) {
+        log.debug("Start create new application with {}", client);
         return new Application()
                 .setClient(client)
                 .setCreationDate(LocalDate.now());
     }
 
     public Application updateApplicationWhenChooseOffer(Application application, LoanOfferDTO loanOfferDTO) {
+        log.debug("Start update application with {} and {}", application, loanOfferDTO);
         application
                 .setStatus(ApplicationStatus.PREAPPROVAL)
                 .setApplicationStatusHistoryDTO(List.of(new ApplicationStatusHistoryDTO()
@@ -53,6 +58,7 @@ public class FillingDataService {
 
     public ScoringDataDTO fillAllInformationToScoringData(FinishRegistrationRequestDTO finishRegistrationRequestDTO,
                                                           Client client, Application application) {
+        log.debug("Start filling scoringData with {}, {} and {}", finishRegistrationRequestDTO, client, application);
         return new ScoringDataDTO()
                 .setAmount(application.getAppliedOffer().getTotalAmount())
                 .setTerm(application.getAppliedOffer().getTerm())
@@ -74,6 +80,7 @@ public class FillingDataService {
     }
 
     public Credit createCreditAfterCalculating(CreditDTO creditDTO, Application application){
+        log.debug("Start create credit with {} and {}", creditDTO, application);
         return new Credit()
                 .setAmount(creditDTO.getAmount())
                 .setTerm(creditDTO.getTerm())
@@ -88,6 +95,7 @@ public class FillingDataService {
     }
 
     public Client fillAllDataOfClient(Client client, FinishRegistrationRequestDTO finishRegistrationRequestDTO){
+        log.debug("Start update client with {} and {}", client, finishRegistrationRequestDTO);
         Passport newPassport = client.getPassportId()
                 .setIssueDate(finishRegistrationRequestDTO.getPassportIssueDate())
                 .setIssueBranch(finishRegistrationRequestDTO.getPassportIssueBranch());
