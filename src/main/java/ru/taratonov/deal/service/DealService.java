@@ -3,6 +3,7 @@ package ru.taratonov.deal.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.taratonov.deal.dto.CreditDTO;
 import ru.taratonov.deal.dto.FinishRegistrationRequestDTO;
 import ru.taratonov.deal.dto.LoanApplicationRequestDTO;
@@ -30,6 +31,7 @@ public class DealService {
     private final RestTemplateRequestsService restTemplateRequestsService;
     private final FillingDataService fillingDataService;
 
+    @Transactional
     public List<LoanOfferDTO> getOffers(LoanApplicationRequestDTO loanApplicationRequestDTO) {
 
         log.info("Get loanApplicationRequestDTO and create new client");
@@ -49,6 +51,7 @@ public class DealService {
         return list;
     }
 
+    @Transactional
     public void chooseOffer(LoanOfferDTO loanOfferDTO) {
         Long applicationId = loanOfferDTO.getApplicationId();
         Optional<Application> foundApplication = applicationRepository.findById(applicationId);
@@ -62,6 +65,7 @@ public class DealService {
         log.debug("application is saved");
     }
 
+    @Transactional
     public void calculateCredit(FinishRegistrationRequestDTO finishRegistrationRequestDTO, Long id) {
         Optional<Application> foundApplication = applicationRepository.findById(id);
         if (foundApplication.isEmpty()) {
