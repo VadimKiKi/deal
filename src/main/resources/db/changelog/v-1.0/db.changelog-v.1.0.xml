@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+
+    <changeSet id="createClientTable" author="vadim_taratonov">
+        <createTable tableName="client">
+            <column name="client_id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="first_name" type="varchar(30)"/>
+            <column name="last_name" type="varchar(30)"/>
+            <column name="middle_name" type="varchar(30)"/>
+            <column name="birth_date" type="DATE"/>
+            <column name="email" type="varchar">
+                <constraints unique="true"/>
+            </column>
+            <column name="gender" type="varchar"/>
+            <column name="marital_status" type="varchar"/>
+            <column name="dependent_amount" type="int"/>
+            <column name="passport_id" type="jsonb"/>
+            <column name="employment_id" type="jsonb"/>
+            <column name="account" type="varchar"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="createCreditTable" author="vadim_taratonov">
+        <createTable tableName="credit">
+            <column name="credit_id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="amount" type="decimal">
+                <constraints checkConstraint="amount > 0"/>
+            </column>
+            <column name="term" type="int">
+                <constraints checkConstraint="term > 0"/>
+            </column>
+            <column name="monthly_payment" type="decimal">
+                <constraints checkConstraint="monthly_payment > 0"/>
+            </column>
+            <column name="rate" type="decimal">
+                <constraints checkConstraint="rate > 0"/>
+            </column>
+            <column name="psk" type="decimal">
+                <constraints checkConstraint="psk > 0"/>
+            </column>
+            <column name="payment_schedule" type="jsonb"/>
+            <column name="insurance_enable" type="boolean"/>
+            <column name="salary_client" type="boolean"/>
+            <column name="credit_status" type="varchar"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="createApplicationTable" author="vadim_taratonov">
+        <createTable tableName="application">
+            <column name="application_id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="client_id" type="BIGINT" >
+                <constraints foreignKeyName="client_id_fk" referencedTableName="client"
+                             referencedColumnNames="client_id" deleteCascade="true"/>
+            </column>
+            <column name="credit_id" type="BIGINT" >
+                <constraints foreignKeyName="credit_id_fk" referencedTableName="credit"
+                             referencedColumnNames="credit_id" deleteCascade="true"/>
+            </column>
+            <column name="status" type="varchar"/>
+            <column name="creation_date" type="date"/>
+            <column name="applied_offer" type="jsonb"/>
+            <column name="sign_date" type="date"/>
+            <column name="ses_code" type="int"/>
+            <column name="status_history" type="jsonb"/>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>
