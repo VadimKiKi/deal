@@ -14,7 +14,7 @@ import ru.taratonov.deal.enums.CreditStatus;
 import ru.taratonov.deal.model.Application;
 import ru.taratonov.deal.model.Client;
 import ru.taratonov.deal.model.Credit;
-import ru.taratonov.deal.model.jsonb.Passport;
+import ru.taratonov.deal.dto.PassportDTO;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -31,7 +31,7 @@ public class FillingDataService {
                 .setMiddleName(loanApplicationRequestDTO.getMiddleName())
                 .setEmail(loanApplicationRequestDTO.getEmail())
                 .setBirthDate(loanApplicationRequestDTO.getBirthdate())
-                .setPassportId(new Passport()
+                .setPassportDTOId(new PassportDTO()
                         .setSeries(loanApplicationRequestDTO.getPassportSeries())
                         .setNumber(loanApplicationRequestDTO.getPassportNumber()));
 
@@ -67,8 +67,8 @@ public class FillingDataService {
                 .setMiddleName(client.getMiddleName())
                 .setGender(finishRegistrationRequestDTO.getGender())
                 .setBirthdate(client.getBirthDate())
-                .setPassportSeries(client.getPassportId().getSeries())
-                .setPassportNumber(client.getPassportId().getNumber())
+                .setPassportSeries(client.getPassportDTOId().getSeries())
+                .setPassportNumber(client.getPassportDTOId().getNumber())
                 .setPassportIssueDate(finishRegistrationRequestDTO.getPassportIssueDate())
                 .setPassportIssueBranch(finishRegistrationRequestDTO.getPassportIssueBranch())
                 .setMaritalStatus(finishRegistrationRequestDTO.getMaritalStatus())
@@ -96,7 +96,7 @@ public class FillingDataService {
 
     public Client fillAllDataOfClient(Client client, FinishRegistrationRequestDTO finishRegistrationRequestDTO){
         log.debug("Start update client with {} and {}", client, finishRegistrationRequestDTO);
-        Passport newPassport = client.getPassportId()
+        PassportDTO newPassportDTO = client.getPassportDTOId()
                 .setIssueDate(finishRegistrationRequestDTO.getPassportIssueDate())
                 .setIssueBranch(finishRegistrationRequestDTO.getPassportIssueBranch());
         client
@@ -105,7 +105,7 @@ public class FillingDataService {
                 .setDependentAmount(finishRegistrationRequestDTO.getDependentAmount())
                 .setEmploymentId(finishRegistrationRequestDTO.getEmployment())
                 .setAccount(finishRegistrationRequestDTO.getAccount())
-                .setPassportId(newPassport);
+                .setPassportDTOId(newPassportDTO);
         return client;
     }
 }

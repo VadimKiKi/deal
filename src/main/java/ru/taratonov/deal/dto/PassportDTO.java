@@ -1,4 +1,4 @@
-package ru.taratonov.deal.model.jsonb;
+package ru.taratonov.deal.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -12,7 +12,7 @@ import java.time.LocalDate;
 
 @Data
 @Accessors(chain = true)
-public class Passport {
+public class PassportDTO {
     private String series;
     private String number;
     private String issueBranch;

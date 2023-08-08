@@ -34,20 +34,22 @@ public class DealService {
     @Transactional
     public List<LoanOfferDTO> getOffers(LoanApplicationRequestDTO loanApplicationRequestDTO) {
 
-        log.info("Get loanApplicationRequestDTO and create new client");
+        log.info("Get loanApplicationRequestDTO and create new client with name - {}, surname - {}",
+                loanApplicationRequestDTO.getFirstName(), loanApplicationRequestDTO.getLastName());
         Client client = fillingDataService.createClientOfRequest(loanApplicationRequestDTO);
         clientRepository.save(client);
-        log.debug("client is saved");
+        log.debug("client {} {} is saved", client.getFirstName(), client.getLastName());
 
 
         Application application = fillingDataService.createApplicationOfRequest(client);
         application = applicationRepository.save(application);
-        log.debug("application is saved");
+        Long applicationId = application.getApplicationId();
+        log.debug("application with id= {} is saved", applicationId);
 
         List<LoanOfferDTO> list = restTemplateRequestsService.requestToGetOffers(loanApplicationRequestDTO);
-        Long applicationId = application.getApplicationId();
-        list.forEach(l -> l.setApplicationId(applicationId));
-        log.debug("application id assigned");
+
+        list.forEach(loanOffer -> loanOffer.setApplicationId(applicationId));
+        log.debug("application id assigned to each loanOffer - {}", applicationId);
         return list;
     }
 
@@ -58,11 +60,11 @@ public class DealService {
         if (foundApplication.isEmpty()) {
             throw ApplicationNotFoundException.createWith(applicationId);
         }
-        log.info("application received");
         Application application = foundApplication.get();
+        log.info("application with id= {} received", application.getApplicationId());
         application = fillingDataService.updateApplicationWhenChooseOffer(application, loanOfferDTO);
         applicationRepository.save(application);
-        log.debug("application is saved");
+        log.debug("application with id= {} is updated", application.getApplicationId());
     }
 
     @Transactional
@@ -72,28 +74,31 @@ public class DealService {
             throw ApplicationNotFoundException.createWith(id);
         }
         Application application = foundApplication.get();
-        log.info("application received");
+        log.info("application with id= {} received", application.getApplicationId());
         Client client = application.getClient();
-        log.debug("client received");
+        log.debug("client {} {} received", client.getFirstName(), client.getLastName());
 
         ScoringDataDTO scoringDataDTO = fillingDataService
                 .fillAllInformationToScoringData(finishRegistrationRequestDTO, client, application);
-        log.debug("scoringDataDTO is ready for calculating");
+        log.debug("scoringDataDTO for {} {} is ready for calculating",
+                scoringDataDTO.getFirstName(), scoringDataDTO.getLastName());
 
         client = fillingDataService.fillAllDataOfClient(client, finishRegistrationRequestDTO);
         clientRepository.save(client);
-        log.debug("client is saved");
+        log.debug("client {} {} is saved", client.getFirstName(), client.getLastName());
 
         CreditDTO creditDTO = restTemplateRequestsService.requestToCalculateCredit(scoringDataDTO);
 
-        assert creditDTO != null;
+        assert creditDTO != null : "creditDTO is null";
         Credit credit = fillingDataService.createCreditAfterCalculating(creditDTO, application);
-        log.info("credit calculated");
+        log.info("credit for {} {} with calculated",
+                client.getFirstName(), client.getLastName());
         creditRepository.save(credit);
-        log.debug("credit is saved");
+        log.debug("credit with id={} for application {} is saved",
+                credit.getCreditId(), credit.getApplication().getApplicationId());
 
         application.setCredit(credit);
         applicationRepository.save(application);
-        log.debug("application is saved");
+        log.debug("application with id={} is saved", application.getApplicationId());
     }
 }

@@ -19,7 +19,7 @@ import org.hibernate.type.SqlTypes;
 import ru.taratonov.deal.dto.EmploymentDTO;
 import ru.taratonov.deal.enums.Gender;
 import ru.taratonov.deal.enums.MaritalStatus;
-import ru.taratonov.deal.model.jsonb.Passport;
+import ru.taratonov.deal.dto.PassportDTO;
 
 import java.time.LocalDate;
 
@@ -65,7 +65,7 @@ public class Client {
 
     @Column(name = "passport_id")
     @JdbcTypeCode(SqlTypes.JSON)
-    private Passport passportId;
+    private PassportDTO passportDTOId;
 
     @Column(name = "employment_id")
     @JdbcTypeCode(SqlTypes.JSON)
