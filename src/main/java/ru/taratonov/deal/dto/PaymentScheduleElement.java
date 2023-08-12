@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,19 +17,42 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PaymentScheduleElement {
-    // Номер платежа
+    @Schema(
+            description = "payment number",
+            name = "number",
+            example = "1")
     private Integer number;
-    // Дата платежа
+
+    @Schema(
+            description = "payment date",
+            name = "date",
+            example = "2023-12-11")
     @JsonFormat(pattern = "yyyy-MM-dd")
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDate date;
-    // Полная сумма месячного платежа
+
+    @Schema(
+            description = "the full amount of the monthly payment",
+            name = "totalPayment",
+            example = "11000")
     private BigDecimal totalPayment;
-    // Сумма платежа в погашение процентов
+
+    @Schema(
+            description = "the amount of the interest payment",
+            name = "interestPayment",
+            example = "1200")
     private BigDecimal interestPayment;
-    // Сумма в погашение тела кредита
+
+    @Schema(
+            description = "the amount to repay the loan body",
+            name = "debtPayment",
+            example = "5785")
     private BigDecimal debtPayment;
-    // Остаток долга
+
+    @Schema(
+            description = "remaining debt",
+            name = "remainingDebt",
+            example = "235367")
     private BigDecimal remainingDebt;
 }

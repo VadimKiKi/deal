@@ -1,5 +1,6 @@
 package ru.taratonov.deal.service;
 
+import com.google.common.base.Throwables;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -10,6 +11,7 @@ import ru.taratonov.deal.dto.LoanApplicationRequestDTO;
 import ru.taratonov.deal.dto.LoanOfferDTO;
 import ru.taratonov.deal.dto.ScoringDataDTO;
 import ru.taratonov.deal.exception.ApplicationNotFoundException;
+import ru.taratonov.deal.exception.DatabaseException;
 import ru.taratonov.deal.model.Application;
 import ru.taratonov.deal.model.Client;
 import ru.taratonov.deal.model.Credit;
@@ -17,6 +19,7 @@ import ru.taratonov.deal.repository.ApplicationRepository;
 import ru.taratonov.deal.repository.ClientRepository;
 import ru.taratonov.deal.repository.CreditRepository;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,7 +40,17 @@ public class DealService {
         log.info("Get loanApplicationRequestDTO and create new client with name - {}, surname - {}",
                 loanApplicationRequestDTO.getFirstName(), loanApplicationRequestDTO.getLastName());
         Client client = fillingDataService.createClientOfRequest(loanApplicationRequestDTO);
-        clientRepository.save(client);
+
+        try {
+            clientRepository.save(client);
+        } catch (RuntimeException e) {
+            Throwable rootCause = Throwables.getRootCause(e);
+            if (rootCause instanceof SQLException) {
+                if ("23505".equals(((SQLException) rootCause).getSQLState())) {
+                    throw new DatabaseException(rootCause.getMessage());
+                }
+            }
+        }
         log.debug("client {} {} is saved", client.getFirstName(), client.getLastName());
 
 

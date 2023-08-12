@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.taratonov.deal.dto.ErrorDTO;
 import ru.taratonov.deal.exception.ApplicationNotFoundException;
+import ru.taratonov.deal.exception.DatabaseException;
 import ru.taratonov.deal.exception.IllegalArgumentOfEnumException;
 import ru.taratonov.deal.exception.IllegalDataFromOtherMsException;
 
@@ -36,7 +37,8 @@ public class ControllerAdvice {
     @ResponseBody
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler({EntityNotFoundException.class, IllegalArgumentException.class,
-            NullPointerException.class, IllegalDataFromOtherMsException.class})
+            NullPointerException.class, IllegalDataFromOtherMsException.class,
+    DatabaseException.class})
     public ErrorDTO handleOtherException(Exception ex) {
         log.error("Handle Exception", ex);
         return new ErrorDTO(ex.getMessage(), LocalDateTime.now(), HttpStatus.BAD_REQUEST);
