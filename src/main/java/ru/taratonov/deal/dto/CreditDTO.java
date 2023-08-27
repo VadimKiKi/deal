@@ -17,6 +17,7 @@ public class CreditDTO {
             name = "amount",
             example = "10000")
     private BigDecimal amount;
+
     @Schema(
             description = "loan term",
             name = "term",

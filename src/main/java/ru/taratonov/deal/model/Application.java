@@ -6,6 +6,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -15,9 +16,9 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
+import ru.taratonov.deal.dto.ApplicationStatusHistoryDTO;
 import ru.taratonov.deal.dto.LoanOfferDTO;
 import ru.taratonov.deal.enums.ApplicationStatus;
-import ru.taratonov.deal.dto.ApplicationStatusHistoryDTO;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -32,12 +33,12 @@ public class Application {
     @Column(name = "application_id")
     private Long applicationId;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "client_id", referencedColumnName = "client_id")
     @JsonBackReference(value = "client_application")
     private Client client;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "credit_id", referencedColumnName = "credit_id")
     @JsonBackReference(value = "credit_application")
     private Credit credit;
@@ -62,5 +63,4 @@ public class Application {
     @Column(name = "status_history")
     @JdbcTypeCode(SqlTypes.JSON)
     private List<ApplicationStatusHistoryDTO> applicationStatusHistoryDTO;
-
 }

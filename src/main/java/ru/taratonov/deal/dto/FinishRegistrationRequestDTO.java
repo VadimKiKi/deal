@@ -1,7 +1,10 @@
 package ru.taratonov.deal.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 import ru.taratonov.deal.enums.Gender;
 import ru.taratonov.deal.enums.MaritalStatus;
 
@@ -25,12 +28,14 @@ public class FinishRegistrationRequestDTO {
             description = "number of dependents",
             name = "dependentAmount",
             example = "1")
+    @Min(value = 0, message = "must be greater or equal than 0")
     private Integer dependentAmount;
 
     @Schema(
             description = "date of issue of the passport",
             name = "passportIssueDate",
             example = "2010-01-01")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate passportIssueDate;
 
     @Schema(
@@ -42,6 +47,7 @@ public class FinishRegistrationRequestDTO {
     @Schema(
             description = "information about person at work",
             name = "employment")
+    @Valid
     private EmploymentDTO employment;
 
     @Schema(

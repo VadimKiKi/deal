@@ -1,6 +1,7 @@
 package ru.taratonov.deal.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -126,6 +127,7 @@ public class ScoringDataDTO {
             description = "information about person at work",
             name = "employment")
     @NotNull(message = "must not be empty")
+    @Valid
     private EmploymentDTO employment;
 
     @Schema(

@@ -1,11 +1,13 @@
 package ru.taratonov.deal.enums;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import lombok.Getter;
 import ru.taratonov.deal.exception.IllegalArgumentOfEnumException;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
+@Getter
 public enum MaritalStatus {
     DIVORCED("divorced"),
     MARRIED("married"),
@@ -23,13 +25,10 @@ public enum MaritalStatus {
                                 .collect(Collectors.toList())));
     }
 
-    private String title;
+    private final String title;
 
     MaritalStatus(String title) {
         this.title = title;
     }
 
-    public String getTitle() {
-        return title;
-    }
 }

@@ -41,18 +41,26 @@ public class FillingDataService {
         log.debug("Start create new application with {}", client);
         return new Application()
                 .setClient(client)
-                .setCreationDate(LocalDate.now());
-    }
-
-    public Application updateApplicationWhenChooseOffer(Application application, LoanOfferDTO loanOfferDTO) {
-        log.debug("Start update application with {} and {}", application, loanOfferDTO);
-        application
                 .setStatus(ApplicationStatus.PREAPPROVAL)
                 .setApplicationStatusHistoryDTO(List.of(new ApplicationStatusHistoryDTO()
                         .setStatus(ApplicationStatus.PREAPPROVAL)
                         .setTime(LocalDate.now())
                         .setChangeType(ChangeType.AUTOMATIC)))
-                .setAppliedOffer(loanOfferDTO);
+                .setCreationDate(LocalDate.now());
+    }
+
+    public Application updateApplicationWhenChooseOffer(Application application, LoanOfferDTO loanOfferDTO) {
+        log.debug("Start update application with {} and {}", application, loanOfferDTO);
+        List<ApplicationStatusHistoryDTO> applicationStatusHistoryDTO = application.getApplicationStatusHistoryDTO();
+        applicationStatusHistoryDTO.add(new ApplicationStatusHistoryDTO()
+                .setStatus(ApplicationStatus.APPROVED)
+                .setTime(LocalDate.now())
+                .setChangeType(ChangeType.AUTOMATIC));
+
+        application
+                .setAppliedOffer(loanOfferDTO)
+                .setStatus(ApplicationStatus.APPROVED)
+                .setApplicationStatusHistoryDTO(applicationStatusHistoryDTO);
         return application;
     }
 
@@ -107,5 +115,17 @@ public class FillingDataService {
                 .setAccount(finishRegistrationRequestDTO.getAccount())
                 .setPassportDTOId(newPassportDTO);
         return client;
+    }
+
+    public Application updateApplicationWithNewStatus(Application application, ApplicationStatus applicationStatus){
+        log.debug("Start update application with new status {} ", applicationStatus);
+        List<ApplicationStatusHistoryDTO> applicationStatusHistoryDTO = application.getApplicationStatusHistoryDTO();
+        applicationStatusHistoryDTO.add(new ApplicationStatusHistoryDTO()
+                .setTime(LocalDate.now())
+                .setChangeType(ChangeType.AUTOMATIC)
+                .setStatus(applicationStatus));
+        application.setApplicationStatusHistoryDTO(applicationStatusHistoryDTO);
+        application.setStatus(applicationStatus);
+        return application;
     }
 }
