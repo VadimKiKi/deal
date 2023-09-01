@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,7 +30,6 @@ import java.util.List;
 @RequestMapping("/deal")
 @RequiredArgsConstructor
 @Tag(name = "Deal Controller", description = "Managing loan offers with using db")
-@Slf4j
 public class DealController {
 
     private final DealService dealService;
@@ -110,7 +108,7 @@ public class DealController {
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
-    @GetMapping("/application/{id}")
+    @GetMapping("/applicationDto/{id}")
     @Operation(summary = "Get applicationDto", description = "Allows to get applicationDto")
     @ApiResponse(
             responseCode = "200",

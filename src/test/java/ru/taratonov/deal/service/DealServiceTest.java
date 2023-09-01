@@ -47,6 +47,9 @@ class DealServiceTest {
     private CreditRepository creditRepository;
     @Mock
     private RestTemplateRequestsService restTemplateRequestsService;
+
+    @Mock
+    private DocumentKafkaService documentKafkaService;
     @InjectMocks
     private DealService dealService;
 

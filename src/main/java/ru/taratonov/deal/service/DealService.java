@@ -48,7 +48,7 @@ public class DealService {
 
         try {
             clientRepository.save(client);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             Throwable rootCause = Throwables.getRootCause(e);
             if (rootCause instanceof SQLException) {
                 if ("23505".equals(((SQLException) rootCause).getSQLState())) {

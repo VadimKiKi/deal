@@ -45,30 +45,30 @@ public class DocumentKafkaService {
         }
     }
 
-    public void sendDocuments(Long id, Theme theme) {
+    public void sendDocuments(Long id) {
         Application application = getApplication(id);
         application = fillingDataService.updateApplicationWithNewStatus(application, ApplicationStatus.PREPARE_DOCUMENTS);
         application = applicationRepository.save(application);
-        sendMessage(application, theme);
+        sendMessage(application, Theme.SEND_DOCUMENTS);
         application = fillingDataService.updateApplicationWithNewStatus(application, ApplicationStatus.DOCUMENT_CREATED);
         applicationRepository.save(application);
     }
 
-    public void requestSignDocument(Long id, Theme theme) {
+    public void requestSignDocument(Long id) {
         Application application = getApplication(id);
         Integer sesCode = generateSesCode();
         application.setSesCode(sesCode);
         application = applicationRepository.save(application);
-        sendMessage(application, theme);
+        sendMessage(application, Theme.SEND_SES);
     }
 
-    public void signDocument(Long id, Integer sesCode, Theme theme) {
+    public void signDocument(Long id, Integer sesCode) {
         Application application = getApplication(id);
         int realCode = application.getSesCode();
         if (sesCode == realCode) {
             application = fillingDataService.updateApplicationWithNewStatus(application,ApplicationStatus.DOCUMENT_SIGNED);
             application = applicationRepository.save(application);
-            sendMessage(application, theme);
+            sendMessage(application, Theme.CREDIT_ISSUED);
             application = fillingDataService.updateApplicationWithNewStatus(application,ApplicationStatus.CREDIT_ISSUED);
             application.setSignDate(LocalDate.now());
             Credit credit = application.getCredit();
