@@ -17,9 +17,9 @@ import lombok.experimental.Accessors;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import ru.taratonov.deal.dto.EmploymentDTO;
+import ru.taratonov.deal.dto.PassportDTO;
 import ru.taratonov.deal.enums.Gender;
 import ru.taratonov.deal.enums.MaritalStatus;
-import ru.taratonov.deal.dto.PassportDTO;
 
 import java.time.LocalDate;
 

@@ -5,11 +5,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import ru.taratonov.deal.dto.ApplicationDTO;
 import ru.taratonov.deal.dto.CreditDTO;
 import ru.taratonov.deal.dto.FinishRegistrationRequestDTO;
 import ru.taratonov.deal.dto.LoanApplicationRequestDTO;
 import ru.taratonov.deal.dto.LoanOfferDTO;
 import ru.taratonov.deal.dto.ScoringDataDTO;
+import ru.taratonov.deal.enums.ApplicationStatus;
 import ru.taratonov.deal.exception.ApplicationNotFoundException;
 import ru.taratonov.deal.model.Application;
 import ru.taratonov.deal.model.Client;
@@ -18,11 +20,16 @@ import ru.taratonov.deal.repository.ApplicationRepository;
 import ru.taratonov.deal.repository.ClientRepository;
 import ru.taratonov.deal.repository.CreditRepository;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -32,15 +39,12 @@ import static org.mockito.Mockito.when;
 class DealServiceTest {
     @Mock
     private FillingDataService fillingDataService;
-
     @Mock
     private ClientRepository clientRepository;
     @Mock
     private ApplicationRepository applicationRepository;
-
     @Mock
     private CreditRepository creditRepository;
-
     @Mock
     private RestTemplateRequestsService restTemplateRequestsService;
     @InjectMocks
@@ -133,6 +137,7 @@ class DealServiceTest {
         when(fillingDataService.fillAllDataOfClient(client, finishRegistrationRequestDTO)).thenReturn(client);
         when(restTemplateRequestsService.requestToCalculateCredit(scoringDataDTO)).thenReturn(creditDTO);
         when(fillingDataService.createCreditAfterCalculating(creditDTO, application)).thenReturn(credit);
+        when(fillingDataService.updateApplicationWithNewStatus(eq(application), any(ApplicationStatus.class))).thenReturn(application);
 
         dealService.calculateCredit(finishRegistrationRequestDTO, id);
 
@@ -145,5 +150,53 @@ class DealServiceTest {
         verify(fillingDataService, times(1)).createCreditAfterCalculating(creditDTO, application);
         verify(creditRepository, times(1)).save(credit);
         verify(applicationRepository, times(1)).save(application);
+    }
+
+    @Test
+    void getApplicationDTOById() {
+        Long id = 1L;
+        Client client = new Client()
+                .setFirstName("")
+                .setMiddleName("")
+                .setLastName("");
+        Credit credit = new Credit()
+                .setAmount(BigDecimal.ONE)
+                .setTerm(0)
+                .setMonthlyPayment(BigDecimal.ONE)
+                .setRate(BigDecimal.ONE)
+                .setPsk(BigDecimal.ONE)
+                .setPaymentSchedule(new ArrayList<>())
+                .setInsuranceEnable(Boolean.TRUE)
+                .setSalaryClient(Boolean.TRUE);
+        Application application = new Application();
+        application.setApplicationId(id)
+                .setClient(client)
+                .setCredit(credit)
+                .setCreationDate(LocalDate.MIN)
+                .setSignDate(LocalDate.MIN)
+                .setSesCode(1111);
+
+        when(applicationRepository.findById(id)).thenReturn(Optional.of(application));
+
+        ApplicationDTO expectedDTO = new ApplicationDTO();
+        expectedDTO.setApplicationId(application.getApplicationId())
+                .setFirstName(application.getClient().getFirstName())
+                .setLastName(application.getClient().getLastName())
+                .setMiddleName(application.getClient().getMiddleName())
+                .setAmount(application.getCredit().getAmount())
+                .setTerm(application.getCredit().getTerm())
+                .setMonthlyPayment(application.getCredit().getMonthlyPayment())
+                .setRate(application.getCredit().getRate())
+                .setPsk(application.getCredit().getPsk())
+                .setPaymentSchedule(application.getCredit().getPaymentSchedule())
+                .setInsuranceEnable(application.getCredit().getInsuranceEnable())
+                .setSalaryClient(application.getCredit().getSalaryClient())
+                .setCreationDate(application.getCreationDate())
+                .setSignDate(application.getSignDate())
+                .setSesCode(application.getSesCode());
+
+        ApplicationDTO actualDTO = dealService.getApplicationDTOById(id);
+
+        assertEquals(expectedDTO, actualDTO);
     }
 }

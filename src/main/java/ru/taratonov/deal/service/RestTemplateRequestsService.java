@@ -22,10 +22,10 @@ import java.util.Objects;
 public class RestTemplateRequestsService {
     private final RestTemplate restTemplate;
 
-    @Value("${path.to.conveyor.get.offers}")
+    @Value("${custom.integration.conveyor.get.offers}")
     private String PATH_TO_CONVEYOR_GET_OFFERS;
 
-    @Value("${path.to.conveyor.calculate.credit}")
+    @Value("${custom.integration.conveyor.calculate.credit}")
     private String PATH_TO_CONVEYOR_CALCULATE_CREDIT;
 
     @Autowired

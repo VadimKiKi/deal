@@ -1,11 +1,13 @@
 package ru.taratonov.deal.enums;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import lombok.Getter;
 import ru.taratonov.deal.exception.IllegalArgumentOfEnumException;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
+@Getter
 public enum Position {
     WORKER("worker"),
     MANAGER("manager"),
@@ -25,13 +27,10 @@ public enum Position {
 
     }
 
-    private String title;
+    private final String title;
 
     Position(String title) {
         this.title = title;
     }
 
-    public String getTitle() {
-        return title;
-    }
 }
