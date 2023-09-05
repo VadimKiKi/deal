@@ -47,7 +47,6 @@
         </dependency>
 
 
-
         <!-- Liquibase - это инструмент для управления изменениями в базе данных и их выполнения -->
         <dependency>
             <groupId>org.liquibase</groupId>
@@ -107,11 +106,11 @@
             <scope>test</scope>
         </dependency>
 
-                <dependency>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-docker-compose</artifactId>
-                    <optional>true</optional>
-                </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-docker-compose</artifactId>
+            <optional>true</optional>
+        </dependency>
 
 
         <dependency>
