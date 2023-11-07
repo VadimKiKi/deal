@@ -53,6 +53,10 @@ public class KafkaConfig {
     public NewTopic applicationDenied() {
         return new NewTopic("application-denied", 1, (short) 1);
     }
+    @Bean
+    public NewTopic audit() {
+        return new NewTopic("audit", 1, (short) 1);
+    }
 
     @Bean
     public AdminClient adminClient() {

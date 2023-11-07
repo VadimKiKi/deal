@@ -53,16 +53,25 @@ services:
     ports:
       - "5433:5432"
     volumes:
-      - C:\logs:/var/lib/postgresql/data
+      - C:\logs\postgres:/var/lib/postgresql/data
     environment:
       POSTGRES_USERNAME: postgres
       POSTGRES_PASSWORD: 1234
       POSTGRES_DB: deal_db
 
+  redis:
+    container_name: redis
+    image: redis:alpine3.18
+    restart: always
+    ports:
+      - '6379:6379'
+    volumes:
+      - C:\logs\redis:/data
+
   deal:
     container_name: deal
     build: .
-    image: deal
+    image: deal-java
     restart: always
     ports:
       - "8081:8081"
@@ -80,13 +89,29 @@ services:
 
   conveyor:
     container_name: conveyor
-    image: conveyor
+    image: conveyor-java
     ports:
       - "8080:8080"
 
+  audit:
+    container_name: audit
+    image: audit-kotlin
+    ports:
+      - "8088:8088"
+    environment:
+      - spring.kafka.consumer.bootstrap-servers=kafka:29092
+      - spring.kafka.consumer.group-id=group-id
+      - spring.kafka.consumer.auto-offset-reset=latest
+      - spring.kafka.consumer.enable-auto-commit=true
+      - spring.kafka.consumer.auto-commit-interval=1000
+      - spring.data.redis.host=redis
+      - spring.data.redis.port=6379
+    depends_on:
+      - redis
+
   application:
     container_name: application
-    image: application
+    image: application-java
     restart: always
     ports:
       - "8082:8082"
@@ -96,7 +121,7 @@ services:
 
   dossier:
     container_name: dossier
-    image: dossier
+    image: dossier-java
     restart: always
     ports:
       - "8083:8083"
@@ -110,7 +135,7 @@ services:
 
   gateway:
     container_name: gateway
-    image: gateway
+    image: gateway-java
     restart: always
     ports:
       - "7777:7777"
@@ -122,3 +147,8 @@ services:
       - custom.integration.deal.url.sign.documents=http://deal:8081/deal/document/{id}/sign
       - custom.integration.deal.url.deny.loan.request=http://deal:8081/deal/document/{id}/deny
       - custom.integration.deal.url.sign.documents.with.code=http://deal:8081/deal/document/{id}/code
+      - custom.integration.audit.url.get.all=http://audit:8088/audit/all
+      - custom.integration.audit.url.get.by.id=http://audit:8088/audit/uuid/{uuid}
+      - custom.integration.audit.url.get.by.type=http://audit:8088/audit/type/{type}
+      - custom.integration.audit.url.get.by.service.type=http://audit:8088/audit/service/{serviceType}
+      - custom.integration.audit.url.save=http://audit:8088/audit

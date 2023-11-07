@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+import ru.taratonov.deal.annotation.ToAudit;
 import ru.taratonov.deal.dto.EmailMessageDTO;
 import ru.taratonov.deal.enums.ApplicationStatus;
 import ru.taratonov.deal.enums.CreditStatus;
@@ -45,6 +46,7 @@ public class DocumentKafkaService {
         }
     }
 
+    @ToAudit
     public void sendDocuments(Long id) {
         Application application = getApplication(id);
         application = fillingDataService.updateApplicationWithNewStatus(application, ApplicationStatus.PREPARE_DOCUMENTS);
@@ -62,14 +64,15 @@ public class DocumentKafkaService {
         sendMessage(application, Theme.SEND_SES);
     }
 
+    @ToAudit
     public void signDocument(Long id, Integer sesCode) {
         Application application = getApplication(id);
         int realCode = application.getSesCode();
         if (sesCode == realCode) {
-            application = fillingDataService.updateApplicationWithNewStatus(application,ApplicationStatus.DOCUMENT_SIGNED);
+            application = fillingDataService.updateApplicationWithNewStatus(application, ApplicationStatus.DOCUMENT_SIGNED);
             application = applicationRepository.save(application);
             sendMessage(application, Theme.CREDIT_ISSUED);
-            application = fillingDataService.updateApplicationWithNewStatus(application,ApplicationStatus.CREDIT_ISSUED);
+            application = fillingDataService.updateApplicationWithNewStatus(application, ApplicationStatus.CREDIT_ISSUED);
             application.setSignDate(LocalDate.now());
             Credit credit = application.getCredit();
             credit.setCreditStatus(CreditStatus.ISSUED);
@@ -83,12 +86,14 @@ public class DocumentKafkaService {
         }
     }
 
+    @ToAudit
     public void denyApplication(Long id) {
         Application application = getApplication(id);
         fillingDataService.updateApplicationWithNewStatus(application, ApplicationStatus.CLIENT_DENIED);
         application = applicationRepository.save(application);
         sendMessage(application, Theme.APPLICATION_DENIED);
     }
+
     public void sendMessageToKafka(EmailMessageDTO emailMessageDTO) throws JsonProcessingException {
         String message = objectMapper.writeValueAsString(emailMessageDTO);
         kafkaTemplate.send(emailMessageDTO.getTheme().getTitle(), message);
@@ -115,7 +120,6 @@ public class DocumentKafkaService {
         log.info("ses code: {} created", sesCode);
         return sesCode;
     }
-
 
 
 }
