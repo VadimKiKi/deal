@@ -68,7 +68,7 @@ public class FillingDataService {
                                                           Client client, Application application) {
         log.debug("Start filling scoringData with {}, {} and {}", finishRegistrationRequestDTO, client, application);
         return new ScoringDataDTO()
-                .setAmount(application.getAppliedOffer().getTotalAmount())
+                .setAmount(application.getAppliedOffer().getRequestedAmount())
                 .setTerm(application.getAppliedOffer().getTerm())
                 .setFirstName(client.getFirstName())
                 .setLastName(client.getLastName())

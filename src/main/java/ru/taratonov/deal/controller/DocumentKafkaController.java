@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.taratonov.deal.dto.ErrorDTO;
-import ru.taratonov.deal.enums.Theme;
 import ru.taratonov.deal.service.DocumentKafkaService;
 
 @RestController
@@ -37,7 +36,7 @@ public class DocumentKafkaController {
                     schema = @Schema(implementation = ErrorDTO.class)))
     public void sendDocument(@Parameter(description = "Id of the application", required = true)
                              @PathVariable("applicationId") Long id) {
-        documentKafkaService.sendDocuments(id, Theme.SEND_DOCUMENTS);
+        documentKafkaService.sendDocuments(id);
     }
 
     @PostMapping("/{applicationId}/sign")
@@ -53,7 +52,7 @@ public class DocumentKafkaController {
                     schema = @Schema(implementation = ErrorDTO.class)))
     public void requestSignDocument(@Parameter(description = "Id of the application", required = true)
                                     @PathVariable("applicationId") Long id) {
-        documentKafkaService.requestSignDocument(id, Theme.SEND_SES);
+        documentKafkaService.requestSignDocument(id);
     }
 
     @PostMapping("/{applicationId}/code")
@@ -72,7 +71,7 @@ public class DocumentKafkaController {
                                      @io.swagger.v3.oas.annotations.parameters.RequestBody(
                                              description = "SES code")
                                      @RequestBody Integer sesCode) {
-        documentKafkaService.signDocument(id, sesCode, Theme.CREDIT_ISSUED);
+        documentKafkaService.signDocument(id, sesCode);
     }
 
     @PostMapping("/{applicationId}/deny")

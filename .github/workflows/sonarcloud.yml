@@ -1,0 +1,47 @@
+name: SonarCloud
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    types: [opened, synchronize, reopened]
+jobs:
+  build:
+    name: Build and analyze
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_DB: deal_db        
+          POSTGRES_PASSWORD: 1234
+          POSTGRES_USER: postgres
+        ports:
+          - 5432:5432
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: Set up JDK 19
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'zulu' # Alternative distribution options are available.
+      - name: Build and analyze
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: mvn -B verify sonar:sonar 
+          -Dsonar.projectKey=VadimTaratonov_deal 
+          -Dsonar.login=$SONAR_TOKEN 
+          -Dsonar.coverage.jacoco.xmlReportPaths=./target/site/jacoco/jacoco.xml
+          -Dsonar.sources=src/main/java/ru/taratonov/deal/service
+          -Dsonar.tests=src/test/java/ru/taratonov/deal/service

@@ -4,7 +4,7 @@ import com.google.common.base.Throwables;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import ru.taratonov.deal.annotation.ToAudit;
 import ru.taratonov.deal.dto.ApplicationDTO;
 import ru.taratonov.deal.dto.CreditDTO;
 import ru.taratonov.deal.dto.FinishRegistrationRequestDTO;
@@ -39,7 +39,7 @@ public class DealService {
     private final FillingDataService fillingDataService;
     private final DocumentKafkaService documentKafkaService;
 
-    @Transactional
+    @ToAudit
     public List<LoanOfferDTO> getOffers(LoanApplicationRequestDTO loanApplicationRequestDTO) {
 
         log.info("Get loanApplicationRequestDTO and create new client with name - {}, surname - {}",
@@ -48,7 +48,7 @@ public class DealService {
 
         try {
             clientRepository.save(client);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             Throwable rootCause = Throwables.getRootCause(e);
             if (rootCause instanceof SQLException) {
                 if ("23505".equals(((SQLException) rootCause).getSQLState())) {
@@ -71,7 +71,7 @@ public class DealService {
         return list;
     }
 
-    @Transactional
+    @ToAudit
     public void chooseOffer(LoanOfferDTO loanOfferDTO) {
         Long applicationId = loanOfferDTO.getApplicationId();
         Optional<Application> foundApplication = applicationRepository.findById(applicationId);
@@ -87,6 +87,7 @@ public class DealService {
         documentKafkaService.sendMessage(application, Theme.FINISH_REGISTRATION);
     }
 
+    @ToAudit
     public void calculateCredit(FinishRegistrationRequestDTO finishRegistrationRequestDTO, Long id) {
         Optional<Application> foundApplication = applicationRepository.findById(id);
         if (foundApplication.isEmpty()) {
