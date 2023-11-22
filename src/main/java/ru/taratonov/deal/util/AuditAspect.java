@@ -15,7 +15,6 @@ import ru.taratonov.deal.enums.AuditActionType;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Aspect
@@ -46,12 +45,10 @@ public class AuditAspect {
 
     private void sendMessage(ProceedingJoinPoint joinPoint, AuditActionType type) {
         AuditAction auditAction = AuditAction.builder()
-                .uuid(UUID.randomUUID())
                 .type(type)
                 .serviceType(AuditActionServiceType.DEAL)
                 .message(createMessage(joinPoint))
                 .build();
-
         try {
             sendMessageToKafka(auditAction);
         } catch (JsonProcessingException e) {

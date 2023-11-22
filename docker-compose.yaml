@@ -95,7 +95,7 @@ services:
 
   audit:
     container_name: audit
-    image: audit-kotlin
+    image: audit-reactive-kotlin
     ports:
       - "8088:8088"
     environment:
