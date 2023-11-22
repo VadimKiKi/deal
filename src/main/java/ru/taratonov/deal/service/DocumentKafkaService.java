@@ -4,11 +4,15 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.aspectj.lang.ProceedingJoinPoint;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
-import ru.taratonov.deal.annotation.ToAudit;
+import ru.taratonov.deal.annotation.Audit;
+import ru.taratonov.deal.dto.AuditAction;
 import ru.taratonov.deal.dto.EmailMessageDTO;
 import ru.taratonov.deal.enums.ApplicationStatus;
+import ru.taratonov.deal.enums.AuditActionServiceType;
+import ru.taratonov.deal.enums.AuditActionType;
 import ru.taratonov.deal.enums.CreditStatus;
 import ru.taratonov.deal.enums.Theme;
 import ru.taratonov.deal.exception.ApplicationNotFoundException;
@@ -18,8 +22,11 @@ import ru.taratonov.deal.repository.ApplicationRepository;
 import ru.taratonov.deal.repository.CreditRepository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +38,7 @@ public class DocumentKafkaService {
     private final ApplicationRepository applicationRepository;
     private final CreditRepository creditRepository;
     private final FillingDataService fillingDataService;
+    private final String KAFKA_TOPIC = "audit";
 
     public void sendMessage(Application application, Theme theme) {
         EmailMessageDTO emailMessageDTO = new EmailMessageDTO()
@@ -39,14 +47,40 @@ public class DocumentKafkaService {
                 .setApplicationId(application.getApplicationId());
         log.debug("EmailMessageDTO is ready to sending {}", emailMessageDTO);
         try {
-            sendMessageToKafka(emailMessageDTO);
+            sendMessageToKafka(emailMessageDTO, emailMessageDTO.getTheme().getTitle());
         } catch (JsonProcessingException e) {
             log.error("error when send message to kafka");
             throw new RuntimeException(e);
         }
     }
 
-    @ToAudit
+    public void sendMessage(ProceedingJoinPoint joinPoint, AuditActionType type) {
+        AuditAction auditAction = AuditAction.builder()
+                .type(type)
+                .serviceType(AuditActionServiceType.DEAL)
+                .message(createMessage(joinPoint))
+                .build();
+        try {
+            sendMessageToKafka(auditAction, KAFKA_TOPIC);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    private String createMessage(ProceedingJoinPoint joinPoint) {
+        return String.join(" ",
+                "Time",
+                LocalDateTime.now().toString(),
+                "Method",
+                joinPoint.getSignature().getName(),
+                "with parameters",
+                Arrays.stream(joinPoint.getArgs())
+                        .map(Object::toString)
+                        .collect(Collectors.joining(", ")));
+    }
+
+    @Audit
     public void sendDocuments(Long id) {
         Application application = getApplication(id);
         application = fillingDataService.updateApplicationWithNewStatus(application, ApplicationStatus.PREPARE_DOCUMENTS);
@@ -64,7 +98,7 @@ public class DocumentKafkaService {
         sendMessage(application, Theme.SEND_SES);
     }
 
-    @ToAudit
+    @Audit
     public void signDocument(Long id, Integer sesCode) {
         Application application = getApplication(id);
         int realCode = application.getSesCode();
@@ -86,7 +120,7 @@ public class DocumentKafkaService {
         }
     }
 
-    @ToAudit
+    @Audit
     public void denyApplication(Long id) {
         Application application = getApplication(id);
         fillingDataService.updateApplicationWithNewStatus(application, ApplicationStatus.CLIENT_DENIED);
@@ -94,10 +128,10 @@ public class DocumentKafkaService {
         sendMessage(application, Theme.APPLICATION_DENIED);
     }
 
-    public void sendMessageToKafka(EmailMessageDTO emailMessageDTO) throws JsonProcessingException {
-        String message = objectMapper.writeValueAsString(emailMessageDTO);
-        kafkaTemplate.send(emailMessageDTO.getTheme().getTitle(), message);
-        log.info("message send to kafka with data {} to topic {}", message, emailMessageDTO.getTheme().getTitle());
+    public void sendMessageToKafka(Object object, String topic) throws JsonProcessingException {
+        String message = objectMapper.writeValueAsString(object);
+        kafkaTemplate.send(topic, message);
+        log.info("message send to kafka with data {} to topic {}", message, topic);
     }
 
     public Application getApplication(Long id) {

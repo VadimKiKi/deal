@@ -10,8 +10,7 @@ import ru.taratonov.deal.util.DealResponseErrorHandler;
 public class Config {
     @Bean
     public RestTemplate restTemplate() {
-        RestTemplateBuilder restTemplateBuilder = new RestTemplateBuilder();
-        return restTemplateBuilder
+        return new RestTemplateBuilder()
                 .errorHandler(new DealResponseErrorHandler())
                 .build();
     }
